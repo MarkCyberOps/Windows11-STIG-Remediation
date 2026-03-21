@@ -1,8 +1,9 @@
 <#
 .SYNOPSIS
-    Enables certificate padding check to mitigate WinVerifyTrust vulnerability.
+    Enables certificate padding check for WinVerifyTrust.
 
 .NOTES
+
     Author          : Mark Tuazon
     LinkedIn        : linkedin.com/in/mark-t-83a52b145/
     GitHub          : github.com/MarkCyberOps
@@ -10,20 +11,28 @@
     Last Modified   : 2026-03-21
     Version         : 1.0
     CVEs            : N/A
+    Author          : Mark Tuazon
     Plugin IDs      : 166555
     STIG-ID         : WN11-SO-000190
 
-.TESTED ON
-    Date(s) Tested  : 2026-03-21
-    Tested By       : Mark Tuazon
-    Systems Tested  : Windows 11 Pro 25H2
-    PowerShell Ver. : 5.1
 
 .USAGE
+    Run with administrative privileges.
+
+    Example:
+    PS C:\> .\WN11-SO-000190_WinVerifyTrust.ps1
 #>
 
 $path = "HKLM:\Software\Microsoft\Cryptography\Wintrust\Config"
+
+# CHECK
+$current = Get-ItemProperty -Path $path -Name EnableCertPaddingCheck -ErrorAction SilentlyContinue
+Write-Output "Current Value: $($current.EnableCertPaddingCheck)"
+
+# REMEDIATION
 New-Item -Path $path -Force | Out-Null
 Set-ItemProperty -Path $path -Name EnableCertPaddingCheck -Value 1 -Type DWord
 
-Write-Output "WinVerifyTrust padding check enabled."
+# VALIDATION
+$new = Get-ItemProperty -Path $path -Name EnableCertPaddingCheck
+Write-Output "Updated Value: $($new.EnableCertPaddingCheck)"
