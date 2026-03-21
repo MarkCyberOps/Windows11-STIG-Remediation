@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Disables TLS 1.0 protocol.
+    Disables TLS 1.0 protocol for both Client and Server.
 
 .NOTES
     Author          : Mark Tuazon
@@ -13,28 +13,46 @@
     Plugin IDs      : 104743
     STIG-ID         : WN11-SO-000025
 
-.TESTED ON
-    Date(s) Tested  : 2026-03-21
-    Tested By       : Mark Tuazon
-    Systems Tested  : Windows 11 Pro 25H2
-    PowerShell Ver. : 5.1
-
 .USAGE
     Run with administrative privileges.
 
     Example:
-    PS C:\> .\WN11-SO-000025_Disable-TLS1.0.ps1
+    PS C:\> .\04-WN11-SO-000025_Disable-TLS1.0.ps1
 #>
 
 $base = "HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.0"
 
-# REMEDIATION
+Write-Output "Checking TLS 1.0 configuration..."
+
+$client = Get-ItemProperty "$base\Client" -ErrorAction SilentlyContinue
+$server = Get-ItemProperty "$base\Server" -ErrorAction SilentlyContinue
+
+Write-Output "Client Enabled: $($client.Enabled)"
+Write-Output "Server Enabled: $($server.Enabled)"
+
+Write-Output "Applying remediation..."
+
 New-Item "$base\Client" -Force | Out-Null
 New-Item "$base\Server" -Force | Out-Null
 
 Set-ItemProperty "$base\Client" -Name Enabled -Value 0 -Type DWord
 Set-ItemProperty "$base\Client" -Name DisabledByDefault -Value 1 -Type DWord
+
 Set-ItemProperty "$base\Server" -Name Enabled -Value 0 -Type DWord
 Set-ItemProperty "$base\Server" -Name DisabledByDefault -Value 1 -Type DWord
 
-Write-Output "TLS 1.0 disabled."
+Start-Sleep -Seconds 2
+
+Write-Output "Validating TLS 1.0 configuration..."
+
+$clientNew = Get-ItemProperty "$base\Client"
+$serverNew = Get-ItemProperty "$base\Server"
+
+Write-Output "Client Enabled: $($clientNew.Enabled)"
+Write-Output "Server Enabled: $($serverNew.Enabled)"
+
+if ($clientNew.Enabled -eq 0 -and $serverNew.Enabled -eq 0) {
+    Write-Output "STIG remediation successful: TLS 1.0 disabled."
+} else {
+    Write-Output "Remediation failed."
+}
