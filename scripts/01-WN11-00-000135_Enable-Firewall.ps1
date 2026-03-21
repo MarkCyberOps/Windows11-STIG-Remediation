@@ -31,38 +31,36 @@
     3. Re-run scan to validate remediation.
 #>
 
-# =========================
-# 🔍 CHECK
-# =========================
 Write-Output "Checking Windows Firewall status..."
 
+# CHECK
 $profiles = Get-NetFirewallProfile
 
-$profiles | Select Name, Enabled
-
-# =========================
-# 🛠️ REMEDIATION
-# =========================
-if ($profiles.Enabled -contains $false) {
-    Write-Output "Remediating: Enabling Windows Firewall on all profiles..."
-
-    Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True
+foreach ($profile in $profiles) {
+    Write-Output "$($profile.Name) Profile Enabled: $($profile.Enabled)"
 }
-else {
+
+# REMEDIATION
+$needsFix = $profiles | Where-Object { $_.Enabled -eq $false }
+
+if ($needsFix) {
+    Write-Output "Remediating: Enabling Windows Firewall on all profiles..."
+    Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled True
+} else {
     Write-Output "No remediation required. Firewall already enabled on all profiles."
 }
 
-# =========================
-# ✅ VALIDATION
-# =========================
+# VALIDATION
 Write-Output "Validating firewall status..."
 
 $updatedProfiles = Get-NetFirewallProfile
-$updatedProfiles | Select Name, Enabled
 
-if ($updatedProfiles.Enabled -notcontains $false) {
-    Write-Output "STIG remediation successful: Firewall is enabled on all profiles."
+foreach ($profile in $updatedProfiles) {
+    Write-Output "$($profile.Name) Profile Enabled: $($profile.Enabled)"
 }
-else {
+
+if (($updatedProfiles | Where-Object { $_.Enabled -eq $false }).Count -eq 0) {
+    Write-Output "STIG remediation successful: Firewall is enabled on all profiles."
+} else {
     Write-Output "Remediation failed: One or more profiles are still disabled."
 }
