@@ -20,6 +20,10 @@
     PowerShell Ver. : 5.1
 
 .USAGE
+    Run with administrative privileges.
+
+    Example:
+    PS C:\> .\WN11-SO-000030_Disable-TLS1.1.ps1
 #>
 
 $base = "HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.1"
@@ -31,5 +35,3 @@ Set-ItemProperty "$base\Client" -Name Enabled -Value 0 -Type DWord
 Set-ItemProperty "$base\Client" -Name DisabledByDefault -Value 1 -Type DWord
 Set-ItemProperty "$base\Server" -Name Enabled -Value 0 -Type DWord
 Set-ItemProperty "$base\Server" -Name DisabledByDefault -Value 1 -Type DWord
-
-Write-Output "TLS 1.1 disabled."
