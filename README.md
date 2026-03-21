@@ -2,90 +2,122 @@
 
 ## Overview
 
-This repository contains PowerShell scripts designed to remediate Security Technical Implementation Guide (STIG) findings on Windows 11 systems. The project demonstrates a vulnerability-driven remediation workflow using credentialed Tenable scans to identify misconfigurations and apply secure configuration changes aligned with DISA STIG requirements.
+This repository demonstrates a vulnerability-driven remediation workflow using PowerShell to enforce DISA STIG compliance on Windows 11 systems. Findings were identified through credentialed Tenable scans, remediated using scripted controls, and validated through post-remediation scans.
 
-The goal of this lab is to simulate real-world vulnerability management by identifying, remediating, and validating security findings in a controlled environment.
+The project simulates real-world vulnerability management practices, focusing on detection, remediation, and validation.
 
 ---
 
 ## Objectives
 
 * Perform credentialed vulnerability scans using Tenable
-* Map findings to official Windows 11 STIG IDs
-* Develop PowerShell scripts to remediate misconfigurations
-* Validate remediation through re-scanning
-* Demonstrate secure system hardening practices
+* Map findings to Windows 11 STIG controls
+* Automate remediation using PowerShell
+* Validate fixes through re-scanning
+* Demonstrate system hardening techniques
 
 ---
 
 ## Lab Environment
 
-* **Operating System:** Windows 11 Pro (25H2, x64 Gen2 VM)
+* **OS:** Windows 11 Pro (25H2, x64 Gen2 VM)
 * **Scanner:** Tenable Vulnerability Management
-* **Access:** Credentialed scan using local administrator account
-* **Protocols Used:** SMB, WMI, WinRM
+* **Access:** Credentialed scan (Local Administrator)
+* **Protocols:** SMB, WMI, WinRM
 
 ---
 
-## Methodology
+## Remediation Methodology
 
-### 1. Initial Scan (Baseline)
+1. **Initial Scan**
+   Conducted a credentialed Tenable scan to establish baseline vulnerabilities.
 
-A credentialed Tenable scan was executed to identify vulnerabilities and configuration issues within the Windows 11 virtual machine.
+2. **Analysis & Mapping**
+   Findings were mapped to official Windows 11 STIG IDs.
 
-### 2. Analysis
+3. **Remediation**
+   PowerShell scripts were developed and executed to enforce compliance.
 
-Scan results were reviewed and mapped to corresponding Windows 11 STIG controls. Only findings with valid STIG mappings were selected for remediation.
-
-### 3. Remediation
-
-PowerShell scripts were developed to enforce STIG-compliant configurations. Each script includes:
-
-* Check (current state)
-* Remediation action
-* Validation step
-
-### 4. Validation
-
-A follow-up Tenable scan was performed to confirm that findings were successfully remediated.
+4. **Validation**
+   A follow-up scan confirmed remediation effectiveness.
 
 ---
 
-## STIG Remediations Implemented
+## Remediation Order
 
-| STIG ID        | Description                                      | Plugin ID |
-| -------------- | ------------------------------------------------ | --------- |
-| WN11-AV-000010 | Microsoft Defender signatures must be up to date | 103569    |
-| WN11-SO-000190 | Enable WinVerifyTrust certificate padding check  | 166555    |
-| WN11-SO-000025 | Disable TLS 1.0                                  | 104743    |
-| WN11-SO-000030 | Disable TLS 1.1                                  | 157288    |
-| WN11-00-000350 | Disable Print Spooler service                    | 151440    |
-| WN11-00-000200 | Disable LLMNR                                    | 160301    |
-| WN11-AC-000030 | Enforce maximum password age                     | 17651     |
-| WN11-AC-000040 | Configure account lockout policy                 | 17651     |
-| WN11-00-000065 | Disable Guest account                            | N/A       |
-| WN11-00-000135 | Enable Windows Firewall                          | N/A       |
+The following order was used to ensure system stability and dependency awareness:
+
+1. Firewall configuration
+2. Microsoft Defender health
+3. System integrity controls
+4. Cryptographic hardening
+5. Network hardening
+6. Service reduction
+7. Account and authentication policies
+
+---
+
+## Implemented STIG Controls
+
+| Order | STIG ID        | Description                  | Plugin ID |
+| ----- | -------------- | ---------------------------- | --------- |
+| 1     | WN11-00-000135 | Enable Windows Firewall      | N/A       |
+| 2     | WN11-AV-000010 | Update Defender signatures   | 103569    |
+| 3     | WN11-SO-000190 | WinVerifyTrust padding check | 166555    |
+| 4     | WN11-SO-000025 | Disable TLS 1.0              | 104743    |
+| 5     | WN11-SO-000030 | Disable TLS 1.1              | 157288    |
+| 6     | WN11-00-000200 | Disable LLMNR                | 160301    |
+| 7     | WN11-00-000350 | Disable Print Spooler        | 151440    |
+| 8     | WN11-00-000065 | Disable Guest Account        | N/A       |
+| 9     | WN11-AC-000030 | Password Policy (Max Age)    | 17651     |
+| 10    | WN11-AC-000040 | Account Lockout Policy       | 17651     |
 
 ---
 
 ## Repository Structure
 
-```
+```text
+scripts/      -> PowerShell remediation scripts (ordered execution)
+evidence/     -> Screenshots and validation artifacts
+README.md     -> Project documentation
+
 Windows11-STIG-Remediation/
 │
 ├── scripts/
-│   ├── WN11-AV-000010_Update-Defender.ps1
-│   ├── WN11-SO-000190_WinVerifyTrust.ps1
-│   ├── WN11-SO-000025_Disable-TLS1.0.ps1
-│   ├── WN11-SO-000030_Disable-TLS1.1.ps1
-│   ├── WN11-00-000350_Disable-Spooler.ps1
-│   ├── WN11-00-000200_Disable-LLMNR.ps1
-│   ├── WN11-AC-000030_PasswordMaxAge.ps1
-│   ├── WN11-AC-000040_AccountLockout.ps1
-│   ├── WN11-00-000065_Disable-Guest.ps1
-│   ├── WN11-00-000135_Enable-Firewall.ps1
+│   ├── 01-WN11-00-000135_Enable-Firewall.ps1
+│   ├── 02-WN11-AV-000010_Update-Defender.ps1
+│   ├── 03-WN11-SO-000190_WinVerifyTrust.ps1
+│   ├── 04-WN11-SO-000025_Disable-TLS1.0.ps1
+│   ├── 05-WN11-SO-000030_Disable-TLS1.1.ps1
+│   ├── 06-WN11-00-000200_Disable-LLMNR.ps1
+│   ├── 07-WN11-00-000350_Disable-Spooler.ps1
+│   ├── 08-WN11-00-000065_Disable-Guest.ps1
+│   ├── 09-WN11-AC-000030_PasswordMaxAge.ps1
+│   ├── 10-WN11-AC-000040_AccountLockout.ps1
+│
+├── evidence/
+│   ├── 01-initial-scan/
+│   ├── 02-findings/
+│   ├── 03-remediation/
+│   ├── 04-validation-scan/
+│   ├── 05-after-findings/
+│   └── README.md
 │
 └── README.md
+```
+
+---
+
+## Evidence Structure
+
+The `/evidence` directory is organized by remediation phase:
+
+```text
+01-initial-scan      -> Baseline scan results (dashboard view)
+02-findings          -> Individual STIG findings (before)
+03-remediation       -> Script execution evidence
+04-validation-scan   -> Post-remediation scan summary
+05-after-findings    -> Verified fixes per STIG
 ```
 
 ---
@@ -98,48 +130,66 @@ Windows11-STIG-Remediation/
 git clone https://github.com/MarkCyberOps/Windows11-STIG-Remediation.git
 ```
 
-2. Navigate to the scripts directory:
+2. Navigate to scripts:
 
 ```
-cd Windows11-STIG-Remediation/scripts
+cd scripts
 ```
 
-3. Run a script (Administrator required):
+3. Run scripts in order (Administrator required):
 
 ```
-.\WN11-AV-000010_Update-Defender.ps1
+.\01-WN11-00-000135_Enable-Firewall.ps1
+.\02-WN11-AV-000010_Update-Defender.ps1
+...
 ```
 
-4. Re-run your Tenable scan to validate remediation.
+4. Re-run Tenable scan to validate remediation.
+
+---
+
+## Before and After Results
+
+Initial scan identified multiple high and medium severity findings.
+After remediation:
+
+* High vulnerabilities reduced to zero
+* Medium vulnerabilities reduced to zero
+* System aligned with STIG baseline
+
+Detailed evidence is available in the `/evidence` directory.
 
 ---
 
 ## Key Takeaways
 
-* Credentialed scans provide deep visibility into system configurations
-* Not all findings are explicitly flagged as vulnerabilities; some require manual validation
-* Automating remediation improves consistency and efficiency
-* STIG compliance strengthens system security posture and reduces attack surface
+* Credentialed scans provide deep configuration visibility
+* Not all issues are automatically flagged; manual validation is required
+* Automation improves consistency and repeatability
+* Structured remediation reduces attack surface effectively
 
 ---
 
 ## Future Improvements
 
-* Add centralized execution script to run all remediations
-* Integrate logging and reporting
-* Expand coverage to additional STIG controls
-* Adapt scripts for domain environments using Group Policy
+* Centralized execution script
+* Logging and reporting enhancements
+* Expanded STIG coverage
+* Domain/GPO integration
 
 ---
 
 ## Author
 
-**Mark Tuazon**
+Mark Tuazon
+
 LinkedIn: https://linkedin.com/in/mark-t-83a52b145/
+
 GitHub: https://github.com/MarkCyberOps
 
 ---
 
 ## Disclaimer
 
-This project is for educational and lab purposes only. Always test remediation scripts in a non-production environment before applying them to live systems.
+This project is for educational and lab purposes only.
+Test all scripts in a non-production environment before deployment.
