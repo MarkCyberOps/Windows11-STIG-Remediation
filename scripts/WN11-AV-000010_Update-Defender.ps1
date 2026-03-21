@@ -20,9 +20,24 @@
     PowerShell Ver. : 5.1
 
 .USAGE
+    Run with administrative privileges.
+
+    Example:
     PS C:\> .\WN11-AV-000010_Update-Defender.ps1
+
+    Workflow:
+    1. Run initial Tenable credentialed scan.
+    2. Execute this script.
+    3. Re-run scan to confirm remediation.
 #>
 
-Write-Output "Updating Microsoft Defender signatures..."
+# CHECK
+$status = Get-MpComputerStatus
+Write-Output "Antivirus Signature Version: $($status.AntivirusSignatureVersion)"
+
+# REMEDIATION
 Update-MpSignature
-Write-Output "Update complete."
+
+# VALIDATION
+$status2 = Get-MpComputerStatus
+Write-Output "Updated Signature Version: $($status2.AntivirusSignatureVersion)"
