@@ -161,6 +161,16 @@ Detailed evidence is available in the `/evidence` directory.
 
 ---
 
+## Notable Challenges and Fixes
+
+#### WinVerifyTrust (WN11-SO-000190) Remediation Note
+
+Initial remediation did not resolve the finding due to a missing 32-bit registry configuration. 
+After applying the fix to both required registry paths (standard and WOW6432Node) and rebooting the system, the finding was successfully remediated.
+
+This highlights the importance of validating both 64-bit and 32-bit registry locations when enforcing security configurations on Windows systems.
+
+---
 ## Key Takeaways
 
 * Credentialed scans provide deep configuration visibility
