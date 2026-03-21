@@ -12,6 +12,8 @@
     CVEs            : N/A
     Plugin IDs      : 166555
     STIG-ID         : WN11-SO-000190
+    Remediation Note: Initial remediation did not resolve the finding due to a missing 32-bit registry configuration.
+                      The fix was applied to both registry paths (standard and WOW6432Node), followed by a system reboot.
 
 .TESTED ON
     Date(s) Tested  : 2026-03-21
