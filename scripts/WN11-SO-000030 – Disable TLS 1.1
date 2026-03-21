@@ -1,0 +1,35 @@
+<#
+.SYNOPSIS
+    Disables TLS 1.1 protocol.
+    
+.NOTES
+    Author          : Mark Tuazon
+    LinkedIn        : linkedin.com/in/mark-t-83a52b145/
+    GitHub          : github.com/MarkCyberOps
+    Date Created    : 2026-03-21
+    Last Modified   : 2026-03-21
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : 157288
+    STIG-ID         : WN11-SO-000030
+
+.TESTED ON
+    Date(s) Tested  : 2026-03-21
+    Tested By       : Mark Tuazon
+    Systems Tested  : Windows 11 Pro 25H2
+    PowerShell Ver. : 5.1
+
+.USAGE
+#>
+
+$base = "HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.1"
+
+New-Item "$base\Client" -Force | Out-Null
+New-Item "$base\Server" -Force | Out-Null
+
+Set-ItemProperty "$base\Client" -Name Enabled -Value 0 -Type DWord
+Set-ItemProperty "$base\Client" -Name DisabledByDefault -Value 1 -Type DWord
+Set-ItemProperty "$base\Server" -Name Enabled -Value 0 -Type DWord
+Set-ItemProperty "$base\Server" -Name DisabledByDefault -Value 1 -Type DWord
+
+Write-Output "TLS 1.1 disabled."
