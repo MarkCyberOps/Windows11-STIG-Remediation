@@ -26,33 +26,24 @@
     PS C:\> .\03-WN11-SO-000190_WinVerifyTrust.ps1
 #>
 
-$path = "HKLM:\Software\Microsoft\Cryptography\Wintrust\Config"
+$paths = @(
+    "HKLM:\Software\Microsoft\Cryptography\Wintrust\Config",
+    "HKLM:\Software\WOW6432Node\Microsoft\Cryptography\Wintrust\Config"
+)
 
-Write-Output "Checking current configuration..."
+Write-Output "Applying WinVerifyTrust padding check remediation..."
 
-$current = Get-ItemProperty -Path $path -Name EnableCertPaddingCheck -ErrorAction SilentlyContinue
-
-if ($null -eq $current) {
-    Write-Output "Value not set (non-compliant)."
-} else {
-    Write-Output "Current Value: $($current.EnableCertPaddingCheck)"
+foreach ($path in $paths) {
+    New-Item -Path $path -Force | Out-Null
+    Set-ItemProperty -Path $path -Name EnableCertPaddingCheck -Value 1 -Type DWord
+    Write-Output "Set EnableCertPaddingCheck at $path"
 }
-
-Write-Output "Applying remediation..."
-
-New-Item -Path $path -Force | Out-Null
-Set-ItemProperty -Path $path -Name EnableCertPaddingCheck -Value 1 -Type DWord
 
 Start-Sleep -Seconds 2
 
-Write-Output "Validating configuration..."
+Write-Output "Validating..."
 
-$new = Get-ItemProperty -Path $path -Name EnableCertPaddingCheck
-
-Write-Output "Updated Value: $($new.EnableCertPaddingCheck)"
-
-if ($new.EnableCertPaddingCheck -eq 1) {
-    Write-Output "STIG remediation successful."
-} else {
-    Write-Output "Remediation failed."
+foreach ($path in $paths) {
+    $value = Get-ItemProperty -Path $path -Name EnableCertPaddingCheck
+    Write-Output "$path = $($value.EnableCertPaddingCheck)"
 }
