@@ -23,15 +23,28 @@
     Run with administrative privileges.
 
     Example:
-    PS C:\> .\WN11-SO-000030_Disable-TLS1.1.ps1
+    PS C:\> .\05-WN11-SO-000030_Disable-TLS1.1.ps1
 #>
 
 $base = "HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.1"
 
+Write-Output "Applying TLS 1.1 remediation..."
+
+# Create keys if needed
 New-Item "$base\Client" -Force | Out-Null
 New-Item "$base\Server" -Force | Out-Null
 
+# Disable TLS 1.1
 Set-ItemProperty "$base\Client" -Name Enabled -Value 0 -Type DWord
 Set-ItemProperty "$base\Client" -Name DisabledByDefault -Value 1 -Type DWord
+
 Set-ItemProperty "$base\Server" -Name Enabled -Value 0 -Type DWord
 Set-ItemProperty "$base\Server" -Name DisabledByDefault -Value 1 -Type DWord
+
+Write-Output "TLS 1.1 has been disabled."
+
+# Validation
+Write-Output "Validating settings..."
+
+Get-ItemProperty "$base\Client"
+Get-ItemProperty "$base\Server"
