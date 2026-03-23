@@ -21,11 +21,37 @@
 
 .USAGE
     Run with administrative privileges.
+
+    Example:
+    PS C:\> .\06-WN11-00-000200_Disable-LLMNR.ps1
 #>
 
 $path = "HKLM:\Software\Policies\Microsoft\Windows NT\DNSClient"
 
+Write-Output "Checking LLMNR configuration..."
+
+$current = Get-ItemProperty -Path $path -Name EnableMulticast -ErrorAction SilentlyContinue
+
+if ($null -eq $current) {
+    Write-Output "LLMNR setting not configured (non-compliant)."
+} else {
+    Write-Output "Current EnableMulticast value: $($current.EnableMulticast)"
+}
+
+Write-Output "Applying remediation..."
+
 New-Item -Path $path -Force | Out-Null
 Set-ItemProperty -Path $path -Name EnableMulticast -Value 0 -Type DWord
 
-Write-Output "LLMNR disabled."
+Start-Sleep -Seconds 2
+
+Write-Output "Validating configuration..."
+
+$new = Get-ItemProperty -Path $path -Name EnableMulticast
+Write-Output "Updated EnableMulticast value: $($new.EnableMulticast)"
+
+if ($new.EnableMulticast -eq 0) {
+    Write-Output "STIG remediation successful."
+} else {
+    Write-Output "Remediation failed."
+}
