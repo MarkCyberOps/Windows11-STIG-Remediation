@@ -21,14 +21,38 @@
 
 .USAGE
     Run with administrative privileges.
+   Example:
+    PS C:\> .\07-WN11-00-000350_Disable-Spooler.ps1
 #>
 
-# CHECK
-Get-Service Spooler
+Write-Output "Checking Print Spooler service..."
 
-# REMEDIATION
-Stop-Service Spooler -Force
-Set-Service Spooler -StartupType Disabled
+$service = Get-Service -Name Spooler
 
-# VALIDATION
-Get-Service Spooler
+Write-Output "Current Status: $($service.Status)"
+Write-Output "Startup Type: $((Get-WmiObject -Class Win32_Service -Filter "Name='Spooler'").StartMode)"
+
+Write-Output "Applying remediation..."
+
+# Stop service
+if ($service.Status -ne "Stopped") {
+    Stop-Service -Name Spooler -Force
+}
+
+# Disable service
+Set-Service -Name Spooler -StartupType Disabled
+
+Start-Sleep -Seconds 2
+
+Write-Output "Validating service status..."
+
+$updated = Get-Service -Name Spooler
+
+Write-Output "Updated Status: $($updated.Status)"
+Write-Output "Updated Startup Type: $((Get-WmiObject -Class Win32_Service -Filter "Name='Spooler'").StartMode)"
+
+if ($updated.Status -eq "Stopped") {
+    Write-Output "STIG remediation successful."
+} else {
+    Write-Output "Remediation failed."
+}
