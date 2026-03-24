@@ -21,6 +21,32 @@
 
 .USAGE
     Run with administrative privileges.
+    Example:
+    PS C:\> .\08-WN11-00-000065_Disable-Guest.ps1
 #>
 
-Disable-LocalUser -Name "Guest"
+Write-Output "Checking Guest account status..."
+
+$user = Get-LocalUser -Name "Guest"
+
+Write-Output "Guest account enabled: $($user.Enabled)"
+
+if ($user.Enabled -eq $true) {
+    Write-Output "Disabling Guest account..."
+    Disable-LocalUser -Name "Guest"
+} else {
+    Write-Output "Guest account already disabled."
+}
+
+Start-Sleep -Seconds 2
+
+Write-Output "Validating..."
+
+$userCheck = Get-LocalUser -Name "Guest"
+Write-Output "Guest account enabled: $($userCheck.Enabled)"
+
+if ($userCheck.Enabled -eq $false) {
+    Write-Output "STIG remediation successful."
+} else {
+    Write-Output "Remediation failed."
+}
