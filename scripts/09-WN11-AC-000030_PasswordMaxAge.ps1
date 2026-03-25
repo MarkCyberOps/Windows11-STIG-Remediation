@@ -21,6 +21,20 @@
 
 .USAGE
     Run with administrative privileges.
+   Example:
+    PS C:\> .\09-WN11-AC-000030_PasswordMaxAge.ps1
 #>
 
+Write-Output "Checking current password policy..."
+
+net accounts
+
+Write-Output "Applying remediation..."
+
 net accounts /maxpwage:60
+
+Start-Sleep -Seconds 2
+
+Write-Output "Validating updated policy..."
+
+net accounts
