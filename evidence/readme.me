@@ -7,6 +7,12 @@ Each subfolder represents a phase of the remediation process:
 - Validation scan
 - Post-remediation results
 
-Note:
-The WinVerifyTrust finding required remediation across both 64-bit and 32-bit registry paths.
-Initial remediation did not resolve the issue until both paths were configured and the system was rebooted.
+Notes:
+- The WinVerifyTrust finding required remediation across both 64-bit and 32-bit registry paths.
+  Initial remediation did not resolve the issue until both paths were configured and the system was rebooted.
+- Print Spooler was disabled as it was not required in the lab environment. In production environments, this control    
+  should be evaluated based on business requirements.
+- WN11-00-000065 – Disable Guest Account: 
+    Detection Method:
+    - Validated locally using PowerShell (Get-LocalUser).
+    - Guest account was enabled in a lab environment to simulate a misconfiguration and demonstrate remediation.
