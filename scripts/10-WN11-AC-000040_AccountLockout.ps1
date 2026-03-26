@@ -21,8 +21,23 @@
 
 .USAGE
     Run with administrative privileges.
+
+    Example:
+    PS C:\> .\10-WN11-AC-000040_AccountLockout.ps1
 #>
+
+Write-Output "Checking current account lockout policy..."
+
+net accounts
+
+Write-Output "Applying remediation..."
 
 net accounts /lockoutthreshold:3
 net accounts /lockoutduration:15
 net accounts /lockoutwindow:15
+
+Start-Sleep -Seconds 2
+
+Write-Output "Validating updated policy..."
+
+net accounts
